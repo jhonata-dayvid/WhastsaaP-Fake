@@ -14,6 +14,7 @@ WhatsAPP fake é um servidor que roda em node.js e simula um servidor de mensage
 ```sh
 npm install express cors
 ```
+Para rodar em modo de desenvolvimento
 ```sh
 npm install liverserver -- 
 ```
