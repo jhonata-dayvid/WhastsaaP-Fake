@@ -16,10 +16,8 @@ describe('Teste com servidor fake WhatsApp', () => {
     cy.contains(`Você disse: ${mensagem}`, { timeout: 10000 }).should('exist');
   });
 
-  it('Envia mensagem e espera resposta simulada', () => {
+  it('EVerificar se o bot responde com os comandos disponíveis', () => {
     cy.visit('http://localhost:3001/');
-
-    const mensagem = 'Mensagem de teste fake';
 
     // Aguardar a página carregar
     cy.get('[data-testid="messageInput"]').should('be.visible');
@@ -31,10 +29,8 @@ describe('Teste com servidor fake WhatsApp', () => {
     cy.contains(`Comandos disponíveis: • Digite "token" para gerar um token • Digite "oi" para cumprimentar • Digite qualquer coisa para conversar!`, { timeout: 10000 }).should('exist');
   });
   
-  it('Envia mensagem e espera resposta simulada', () => {
+  it('Verificar se o bot responde com o token', () => {
     cy.visit('http://localhost:3001/');
-
-    const mensagem = 'Mensagem de teste fake';
 
     // Aguardar a página carregar
     cy.get('[data-testid="messageInput"]').should('be.visible');
