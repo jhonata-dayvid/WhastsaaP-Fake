@@ -1,0 +1,27 @@
+# Ignora dependências
+node_modules/
+
+# Ignora o cache do Cypress
+cypress/cache/
+
+# Ignora arquivos de screenshots e vídeos gerados pelos testes
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+
+# Ignora configurações específicas de ambiente ou temporários
+.env
+.env.local
+*.log
+
+# Ignora arquivos do sistema (Windows/macOS)
+.DS_Store
+Thumbs.db
+
+# Ignora arquivos de build (caso use frameworks como React, Vue, etc.)
+dist/
+build/
+
+# Editor configs (VSCode, WebStorm etc.)
+.vscode/
+.idea/

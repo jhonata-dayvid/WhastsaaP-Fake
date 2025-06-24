@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fake WhatsApp</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Sidebar (apenas decorativa por enquanto) -->
+    <aside class="sidebar" data-testid="sidebar">
+      <div class="sidebar-header">
+        <img src="https://via.placeholder.com/40/25D366/FFFFFF?text=JD" class="avatar" data-testid="userAvatar">
+        <div class="sidebar-actions">
+          <button data-testid="statusBtn">🧭</button>
+          <button data-testid="chatListBtn">💬</button>
+          <button data-testid="menuSidebarBtn">⋮</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Chat principal -->
+    <main class="chat-container">
+      
+      <!-- Header -->
+      <div class="chat-header" data-testid="chatHeader">
+        <div class="contact-info">
+          <img src="https://via.placeholder.com/40/25D366/FFFFFF?text=Bot" class="avatar" data-testid="contactAvatar">
+          <div>
+            <h3 class="contact-name" data-testid="contactName">WhatsaaP Bot</h3>
+            <span class="status" data-testid="contactStatus">online</span>
+          </div>
+        </div>
+        <div class="chat-actions">
+          <button data-testid="searchBtn">🔍</button>
+          <button data-testid="callBtn">📞</button>
+          <button data-testid="videoCallBtn">📹</button>
+          <button data-testid="menuBtn">⋮</button>
+        </div>
+      </div>
+
+      <!-- Área de mensagens -->
+      <div class="chat-area" id="chatArea" data-testid="chatArea">
+        <div class="message bot-message" data-testid="message">
+          <div class="message-content">
+            <p>Olá! Eu sou o WhatsApp Clicksigner Bot. Agora é possível testar fluxos utilizando WhatsAPP!</p>
+            <span class="message-time" data-testid="messageTime">12:00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="input-area" data-testid="inputArea">
+        <button class="attachment-btn" data-testid="attachmentBtn">📎</button>
+        <input type="text" id="mensagem" placeholder="Digite uma mensagem" autocomplete="on" data-testid="messageInput">
+        <button class="emoji-btn" data-testid="emojiBtn">😊</button>
+        <button class="send-btn" id="sendBtn" data-testid="sendBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
