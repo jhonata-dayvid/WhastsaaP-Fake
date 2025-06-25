@@ -2,7 +2,7 @@
 
 ## Overview
 
-WhatsAPP fake é um servidor que roda em node.js e simula um servidor de mensagens do whatsapp. Essencial para quem precisa realizar testes via cypress onde a sua aplicação precisa de um servidor de mensagens. Altamente configurável e pode 
+WhatsAPP fake é um servidor que roda em node.js e simula um servidor de mensagens do whatsapp. Essencial para quem precisa realizar testes via cypress onde a sua aplicação precisa de um servidor de mensagens. Altamente configurável e fácil de usar.
 
 ### Requisitos
 
