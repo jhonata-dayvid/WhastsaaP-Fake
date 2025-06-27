@@ -25,12 +25,143 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Função para adicionar mensagem ao chat (modificada para suportar imagens)
-    function addMessage(text, isUser = false, imageData = null) {
+    // Função para obter ícone do arquivo baseado no tipo
+    function getFileIcon(type) {
+        if (type.startsWith('image/')) return '🖼️';
+        if (type === 'application/pdf') return '📄';
+        if (type.includes('word')) return '📝';
+        if (type.includes('excel') || type.includes('spreadsheet')) return '📊';
+        if (type.startsWith('text/')) return '📃';
+        return '📎';
+    }
+
+    // Função para formatar tamanho do arquivo
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Função para verificar se o arquivo é permitido
+    function isFileAllowed(file) {
+        const allowedTypes = [
+            'image/',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'text/plain',
+            'text/csv'
+        ];
+        
+        return allowedTypes.some(type => 
+            file.type.startsWith(type) || file.type === type
+        );
+    }
+
+    // Função para criar elemento de arquivo para preview
+    function createFilePreview(file) {
+        const fileDiv = document.createElement('div');
+        fileDiv.style.display = 'flex';
+        fileDiv.style.alignItems = 'center';
+        fileDiv.style.padding = '8px';
+        fileDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        fileDiv.style.borderRadius = '8px';
+        fileDiv.style.marginBottom = '8px';
+
+        const icon = document.createElement('span');
+        icon.style.fontSize = '24px';
+        icon.style.marginRight = '12px';
+        icon.textContent = getFileIcon(file.type);
+
+        const fileInfo = document.createElement('div');
+        fileInfo.style.flex = '1';
+
+        const fileName = document.createElement('div');
+        fileName.style.fontWeight = 'bold';
+        fileName.style.marginBottom = '4px';
+        fileName.textContent = file.name;
+
+        const fileSize = document.createElement('div');
+        fileSize.style.fontSize = '12px';
+        fileSize.style.color = '#8696a0';
+        fileSize.textContent = formatFileSize(file.size);
+
+        fileInfo.appendChild(fileName);
+        fileInfo.appendChild(fileSize);
+        fileDiv.appendChild(icon);
+        fileDiv.appendChild(fileInfo);
+
+        return fileDiv;
+    }
+
+    // Função para criar elemento de arquivo com download
+    function createDownloadableFile(fileData) {
+        const fileDiv = document.createElement('div');
+        fileDiv.style.display = 'flex';
+        fileDiv.style.alignItems = 'center';
+        fileDiv.style.padding = '8px';
+        fileDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        fileDiv.style.borderRadius = '8px';
+        fileDiv.style.marginBottom = '8px';
+        fileDiv.style.cursor = 'pointer';
+        fileDiv.style.transition = 'background-color 0.2s';
+
+        // Hover effect
+        fileDiv.addEventListener('mouseenter', () => {
+            fileDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+        });
+        fileDiv.addEventListener('mouseleave', () => {
+            fileDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        });
+
+        const icon = document.createElement('span');
+        icon.style.fontSize = '24px';
+        icon.style.marginRight = '12px';
+        icon.textContent = fileData.icone;
+
+        const fileInfo = document.createElement('div');
+        fileInfo.style.flex = '1';
+
+        const fileName = document.createElement('div');
+        fileName.style.fontWeight = 'bold';
+        fileName.style.marginBottom = '4px';
+        fileName.textContent = fileData.nome;
+
+        const fileSize = document.createElement('div');
+        fileSize.style.fontSize = '12px';
+        fileSize.style.color = '#8696a0';
+        fileSize.textContent = `${fileData.tamanho}KB`;
+
+        const downloadIcon = document.createElement('span');
+        downloadIcon.style.fontSize = '16px';
+        downloadIcon.style.marginLeft = '8px';
+        downloadIcon.textContent = '⬇️';
+
+        fileInfo.appendChild(fileName);
+        fileInfo.appendChild(fileSize);
+        fileDiv.appendChild(icon);
+        fileDiv.appendChild(fileInfo);
+        fileDiv.appendChild(downloadIcon);
+
+        // Adicionar funcionalidade de download
+        fileDiv.addEventListener('click', () => {
+            window.open(fileData.url, '_blank');
+        });
+
+        return fileDiv;
+    }
+
+    // Função para adicionar mensagem ao chat (modificada para suportar arquivos)
+    function addMessage(text, isUser = false, imageData = null, fileData = null, filePreview = null) {
         console.log('=== ADICIONANDO MENSAGEM ===');
         console.log('Texto:', text);
         console.log('É usuário:', isUser);
         console.log('Tem imagem:', !!imageData);
+        console.log('Tem arquivo:', !!fileData);
         
         const messageDiv = document.createElement('div');
         messageDiv.style.marginBottom = '8px';
@@ -62,12 +193,24 @@ document.addEventListener('DOMContentLoaded', function() {
             
             bubble.appendChild(img);
         }
+
+        // Se há um arquivo para preview (usuário enviando)
+        if (filePreview) {
+            bubble.appendChild(filePreview);
+        }
+
+        // Se há um arquivo para download (resposta do bot)
+        if (fileData) {
+            const downloadableFile = createDownloadableFile(fileData);
+            bubble.appendChild(downloadableFile);
+        }
         
         // Adicionar texto se existir
         if (text) {
             const textP = document.createElement('p');
             textP.style.margin = '0';
             textP.style.fontSize = '14px';
+            textP.style.whiteSpace = 'pre-line'; // Para quebras de linha
             textP.textContent = text;
             bubble.appendChild(textP);
         }
@@ -123,40 +266,45 @@ document.addEventListener('DOMContentLoaded', function() {
     async function processSelectedFile(file) {
         if (!file) return;
         
-        // Verificar se é uma imagem
-        if (!file.type.startsWith('image/')) {
-            alert('Por favor, selecione apenas arquivos de imagem.');
+        // Verificar se o arquivo é permitido
+        if (!isFileAllowed(file)) {
+            alert('Tipo de arquivo não permitido. Tipos aceitos: Imagens, PDF, Word, Excel, TXT, CSV');
             return;
         }
         
-        // Verificar tamanho do arquivo (máximo 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('A imagem deve ter no máximo 5MB.');
+        // Verificar tamanho do arquivo (máximo 10MB)
+        if (file.size > 100 * 1024 * 1024) {
+            alert('O arquivo deve ter no máximo 100MB.');
             return;
         }
         
         try {
-            const imageData = await createImagePreview(file);
-            
-            // Adicionar mensagem com imagem
-            addMessage('', true, imageData);
+            // Se for imagem, mostrar preview da imagem
+            if (file.type.startsWith('image/')) {
+                const imageData = await createImagePreview(file);
+                addMessage('', true, imageData);
+            } else {
+                // Se for documento, mostrar preview do arquivo
+                const filePreview = createFilePreview(file);
+                addMessage('', true, null, null, filePreview);
+            }
             
             // Enviar para o servidor
-            await enviarImagem(file);
+            await enviarArquivo(file);
             
         } catch (error) {
-            console.error('Erro ao processar imagem:', error);
-            alert('Erro ao processar a imagem.');
+            console.error('Erro ao processar arquivo:', error);
+            alert('Erro ao processar o arquivo.');
         }
     }
 
-    // Função para enviar imagem para o servidor
-    async function enviarImagem(file) {
+    // Função para enviar arquivo para o servidor
+    async function enviarArquivo(file) {
         try {
             const formData = new FormData();
-            formData.append('imagem', file);
+            formData.append('arquivo', file);
             
-            const response = await fetch('/enviar-imagem', {
+            const response = await fetch('/enviar-arquivo', {
                 method: 'POST',
                 body: formData
             });
@@ -164,14 +312,19 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 const data = await response.json();
                 if (data.resposta) {
-                    addMessage(data.resposta, false);
+                    // Se há dados do arquivo, adicionar com funcionalidade de download
+                    if (data.arquivo) {
+                        addMessage(data.resposta, false, null, data.arquivo);
+                    } else {
+                        addMessage(data.resposta, false);
+                    }
                 }
             } else {
-                addMessage('Erro ao enviar imagem', false);
+                addMessage('Erro ao enviar arquivo', false);
             }
             
         } catch (error) {
-            console.error('Erro ao enviar imagem:', error);
+            console.error('Erro ao enviar arquivo:', error);
             addMessage('Erro ao conectar com o servidor', false);
         }
     }

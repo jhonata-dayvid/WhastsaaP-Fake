@@ -25,3 +25,5 @@ build/
 # Editor configs (VSCode, WebStorm etc.)
 .vscode/
 .idea/
+# Ignora arquivos de imagens e documentos que são enviados para o servidor
+faker_whatsaap/uploads/
